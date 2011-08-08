@@ -6,13 +6,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import junit.framework.Assert;
+
 import com.codereanimator.scrum.documentation.export.ExcelExporter;
 import com.codereanimator.scrum.documentation.export.WordExporter;
 import com.codereanimator.scrum.documentation.model.Story;
 import com.codereanimator.scrum.documentation.model.Test;
 import com.codereanimator.scrum.documentation.sourceparser.SourceParser;
-
-import junit.framework.Assert;
 
 /**
  * As a Tester, I want documentation about the features and test cases the project contains so that
@@ -23,7 +23,8 @@ import junit.framework.Assert;
  */
 public class Story124 {
 	
-	private static final String STORY_123_SOURCE_PATH = Story123.class.getResource(".").getFile(); //"C:\\Users\\Sauli\\Programming\\Java\\eclipse-indigo-workspace\\tddpoc\\src\\test\\java\\fi\\mandatumlife\\tdd\\poc\\tddpoc\\sprint38\\Story644.java";
+	private static final String STORY_123_SOURCE_PATH = new File(".").getAbsolutePath() + "/src/test/java".replaceAll("/", "\\"+File.separator) + File.separator + Story123.class.getCanonicalName().replaceAll("\\.", "\\"+File.separator) + ".java"; //"C:\\Users\\Sauli\\Programming\\Java\\eclipse-indigo-workspace\\tddpoc\\src\\test\\java\\fi\\mandatumlife\\tdd\\poc\\tddpoc\\sprint38\\Story644.java";
+	private static final String TESTS_DIRECTORY = new File(".").getAbsolutePath() + "/src/test/java".replaceAll("/", "\\"+File.separator);
 	
 	/**
 	 * Story number is 123 and the description is
@@ -35,12 +36,22 @@ public class Story124 {
 		Assert.assertEquals(123, story.getNumber());
 		Assert.assertEquals("As a User, I want to log in to the application so that I can access my personal information.", story.getDescription());
 	}
+	
+	/**
+	 * Test directory contains two stories.
+	 */
+	@org.junit.Test
+	public void testReadStoriesFromDirectory(){
+		List<Story> stories = new SourceParser().parseStories(new File(TESTS_DIRECTORY));
+		Assert.assertEquals(2, stories.size());
+	}
+	
 	/**
 	 * Story 123 contains 4 test cases.
 	 * 1 Manual test, 1 robot test and 2 unit tests.
 	 */
 	@org.junit.Test
-	public void testStoryn123TestTypes() throws Exception {
+	public void testStory123TestTypes() throws Exception {
 		Story story = new SourceParser().parseStory(new File(STORY_123_SOURCE_PATH));
 		
 		Assert.assertEquals(4, story.getTests().size());
@@ -95,10 +106,9 @@ public class Story124 {
 	 */
 	@org.junit.Test
 	public void generateWordReport() throws Exception {
-		Story story = new SourceParser().parseStory(new File(STORY_123_SOURCE_PATH));
+		List<Story> stories = new SourceParser().parseStories(new File(TESTS_DIRECTORY));
 		FileOutputStream fileOutputStream = new FileOutputStream(new File("c:\\temp\\report.doc"));
-		new WordExporter().export(story, fileOutputStream);
-		fileOutputStream.flush();
+		new WordExporter().export(stories, fileOutputStream);
 		fileOutputStream.close();
 	}
 	
@@ -108,10 +118,9 @@ public class Story124 {
 	 */
 	@org.junit.Test
 	public void generateExcelReport() throws Exception {
-		Story story = new SourceParser().parseStory(new File(STORY_123_SOURCE_PATH));
+		List<Story> stories = new SourceParser().parseStories(new File(TESTS_DIRECTORY));
 		FileOutputStream fileOutputStream = new FileOutputStream(new File("c:\\temp\\report.xls"));
-		new ExcelExporter().export(story, fileOutputStream);
-		fileOutputStream.flush();
+		new ExcelExporter().export(stories, fileOutputStream);
 		fileOutputStream.close();
 	}
 }

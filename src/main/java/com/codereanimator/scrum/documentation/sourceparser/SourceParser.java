@@ -3,12 +3,8 @@ package com.codereanimator.scrum.documentation.sourceparser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -43,6 +39,20 @@ public class SourceParser {
 		JavaClass javaClass = source.getClasses()[0];
 	
 		return toStory(javaClass);
+	}
+	
+	public List<Story> parseStories(File directory){
+		JavaDocBuilder javaDocBuilder = new JavaDocBuilder();
+		javaDocBuilder.addSourceTree(directory);
+		
+		List<Story> stories = new ArrayList<Story>();
+		
+		for(JavaSource source : javaDocBuilder.getSources()){
+			JavaClass javaClass = source.getClasses()[0];
+			stories.add(toStory(javaClass));
+		}
+		
+		return stories;
 	}
 	
 	private Story toStory(JavaClass javaClass){
@@ -84,6 +94,10 @@ public class SourceParser {
 	}
 	
 	private boolean isTestMethod(JavaMethod method){
+		if(!StringUtils.startsWith(method.getName(), "test")){
+			return false;
+		}
+		
 		Annotation[] annotations = method.getAnnotations();
 		
 		if(ArrayUtils.isEmpty(annotations)){

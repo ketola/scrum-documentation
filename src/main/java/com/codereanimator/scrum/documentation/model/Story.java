@@ -1,6 +1,5 @@
 package com.codereanimator.scrum.documentation.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Story {
